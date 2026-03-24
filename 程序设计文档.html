@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纸牌游戏 - 程序设计文档</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, "Microsoft YaHei", "Segoe UI", sans-serif;
+            line-height: 1.8;
+            color: #2c3e50;
+            background: #f5f7fa;
+        }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #2878b5, #1a5276);
+            color: white;
+            padding: 50px 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+        header h1 { font-size: 2.2em; margin-bottom: 10px; }
+        header p { font-size: 1.1em; opacity: 0.9; }
+
+        /* Navigation */
+        nav {
+            background: white;
+            border-radius: 10px;
+            padding: 20px 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+        nav h3 { margin-bottom: 10px; color: #2878b5; }
+        nav a {
+            display: inline-block;
+            margin: 4px 8px;
+            color: #2878b5;
+            text-decoration: none;
+            padding: 4px 12px;
+            border-radius: 4px;
+            background: #eef4fb;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        nav a:hover { background: #2878b5; color: white; }
+
+        /* Section */
+        section {
+            background: white;
+            border-radius: 10px;
+            padding: 35px 40px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        section h2 {
+            font-size: 1.6em;
+            color: #1a5276;
+            border-bottom: 3px solid #2878b5;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        section h3 {
+            font-size: 1.2em;
+            color: #2878b5;
+            margin: 20px 0 10px;
+        }
+        section h4 {
+            font-size: 1.05em;
+            color: #34495e;
+            margin: 15px 0 8px;
+        }
+
+        /* Code */
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 18px 22px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 0.88em;
+            line-height: 1.6;
+            margin: 12px 0;
+        }
+        code {
+            background: #eef4fb;
+            color: #c0392b;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        pre code { background: none; color: inherit; padding: 0; }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e8ecf1;
+        }
+        th { background: #eef4fb; color: #1a5276; font-weight: 600; }
+        tr:hover td { background: #f8fafc; }
+
+        /* Status badges */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.82em;
+            font-weight: 600;
+        }
+        .badge-ok { background: #d4edda; color: #155724; }
+        .badge-fix { background: #fff3cd; color: #856404; }
+        .badge-new { background: #cce5ff; color: #004085; }
+
+        /* Tree */
+        .tree {
+            font-family: "Consolas", "Courier New", monospace;
+            background: #f8fafc;
+            padding: 18px 22px;
+            border-radius: 8px;
+            border-left: 4px solid #2878b5;
+            line-height: 1.7;
+            font-size: 0.92em;
+        }
+        .tree .folder { color: #2878b5; font-weight: bold; }
+        .tree .comment { color: #7f8c8d; }
+
+        /* Bug card */
+        .bug-card {
+            border-left: 4px solid #e74c3c;
+            background: #fdf2f2;
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+        .bug-card.fixed { border-left-color: #27ae60; background: #f0faf4; }
+        .bug-card h4 { margin-top: 0; }
+        .bug-card .label {
+            display: inline-block;
+            font-size: 0.8em;
+            padding: 2px 8px;
+            border-radius: 3px;
+            margin-right: 6px;
+        }
+        .bug-card .label-cause { background: #fce4ec; color: #c0392b; }
+        .bug-card .label-fix { background: #e8f5e9; color: #27ae60; }
+        .bug-card .label-file { background: #e3f2fd; color: #1565c0; }
+
+        /* Improve card */
+        .improve-card {
+            border-left: 4px solid #2878b5;
+            background: #eef4fb;
+            padding: 18px 22px;
+            border-radius: 0 8px 8px 0;
+            margin: 15px 0;
+        }
+
+        /* Flow diagram */
+        .flow {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .flow .step {
+            background: #eef4fb;
+            border: 1px solid #b8d4f0;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.9em;
+        }
+        .flow .arrow { color: #2878b5; font-weight: bold; font-size: 1.2em; }
+
+        ul, ol { padding-left: 24px; margin: 8px 0; }
+        li { margin: 4px 0; }
+        p { margin: 8px 0; }
+        strong { color: #1a5276; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+<header>
+    <h1>纸牌游戏 - 程序设计文档</h1>
+    <p>Cocos2d-x 3.17 | MVC 架构 | C++ | 设计分辨率 1080x2080</p>
+    <p style="margin-top:8px; font-size:0.9em; opacity:0.7;">文档生成日期：2026-03-24</p>
+</header>
+
+<nav>
+    <h3>目录导航</h3>
+    <a href="#req">需求达成检查</a>
+    <a href="#arch">架构设计</a>
+    <a href="#files">文件结构</a>
+    <a href="#flow">交互流程</a>
+    <a href="#bugs">Bug修复记录</a>
+    <a href="#improve">优化改进记录</a>
+    <a href="#anim">动画系统</a>
+    <a href="#extend">扩展指南</a>
+    <a href="#build">构建说明</a>
+</nav>
+
+<!-- ==================== 需求达成 ==================== -->
+<section id="req">
+    <h2>一、需求达成检查</h2>
+    <p>对照《纸牌程序设计》PDF中的所有需求，逐项确认实现状态：</p>
+
+    <h3>1. 核心玩法需求</h3>
+    <table>
+        <tr><th>需求项</th><th>要求</th><th>状态</th></tr>
+        <tr>
+            <td>初始底牌</td>
+            <td>初始有一张底牌，与主牌区匹配消除</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>主牌堆</td>
+            <td>翻开/覆盖状态，消除上方牌后才能翻开</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>底牌堆（手牌区）</td>
+            <td>接收匹配的纸牌，数字差1即可</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>备用牌堆</td>
+            <td>点击抽取新牌补充底牌</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>消除规则</td>
+            <td>点数差1可匹配，无花色限制</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+    </table>
+
+    <h3>2. 功能需求</h3>
+    <table>
+        <tr><th>需求项</th><th>要求</th><th>状态</th></tr>
+        <tr>
+            <td>需求1：手牌区翻牌替换</td>
+            <td>点击手牌区，牌平移（MoveTo）到底牌堆顶部替换</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>需求2：桌面牌匹配</td>
+            <td>点击桌面牌与底牌区顶部匹配，平移替换</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>需求3：回退功能</td>
+            <td>连续多次回退，各卡牌反向平移回原位置</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>动画过渡</td>
+            <td>所有操作需有平滑的MoveTo动画</td>
+            <td><span class="badge badge-new">优化增强</span></td>
+        </tr>
+    </table>
+
+    <h3>3. 架构与规范需求</h3>
+    <table>
+        <tr><th>需求项</th><th>要求</th><th>状态</th></tr>
+        <tr>
+            <td>MVC架构</td>
+            <td>models/views/controllers 分层</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>目录结构</td>
+            <td>configs/models/views/controllers/managers/services/utils</td>
+            <td><span class="badge badge-ok">完全匹配</span></td>
+        </tr>
+        <tr>
+            <td>开发环境</td>
+            <td>Cocos2d-x 3.17</td>
+            <td><span class="badge badge-ok">3.17.2</span></td>
+        </tr>
+        <tr>
+            <td>设计分辨率</td>
+            <td>1080x2080, FIXED_WIDTH</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>关卡JSON配置</td>
+            <td>Playfield数组 + Stack数组</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>序列化支持</td>
+            <td>CardModel支持serialize/deserialize</td>
+            <td><span class="badge badge-ok">已实现</span></td>
+        </tr>
+        <tr>
+            <td>命名规范</td>
+            <td>驼峰命名，私有成员_下划线前缀</td>
+            <td><span class="badge badge-ok">已遵循</span></td>
+        </tr>
+        <tr>
+            <td>程序设计文档</td>
+            <td>交付文档，描述扩展方式（加分项）</td>
+            <td><span class="badge badge-new">本文档</span></td>
+        </tr>
+    </table>
+</section>
+
+<!-- ==================== 架构设计 ==================== -->
+<section id="arch">
+    <h2>二、架构设计</h2>
+    <p>项目严格遵循 MVC 架构，将数据、视图、逻辑三者分离。各层通过回调接口通信，避免双向依赖。</p>
+
+    <h3>分层职责</h3>
+    <table>
+        <tr><th>层级</th><th>目录</th><th>职责</th><th>关键类</th></tr>
+        <tr>
+            <td><strong>Config层</strong></td>
+            <td>configs/</td>
+            <td>静态配置，加载JSON关卡数据和资源路径</td>
+            <td>LevelConfig, LevelConfigLoader, CardResConfig</td>
+        </tr>
+        <tr>
+            <td><strong>Model层</strong></td>
+            <td>models/</td>
+            <td>运行时数据模型，不含业务逻辑</td>
+            <td>CardModel, GameModel, UndoModel</td>
+        </tr>
+        <tr>
+            <td><strong>View层</strong></td>
+            <td>views/</td>
+            <td>UI展示 + 用户输入捕获，不含业务逻辑</td>
+            <td>CardView, GameView, PlayFieldView, TrayView, StackView</td>
+        </tr>
+        <tr>
+            <td><strong>Controller层</strong></td>
+            <td>controllers/</td>
+            <td>协调Model与View，处理业务逻辑</td>
+            <td>GameController, PlayFieldController, StackController</td>
+        </tr>
+        <tr>
+            <td><strong>Manager层</strong></td>
+            <td>managers/</td>
+            <td>Controller的成员，管理Model数据加工，禁止单例</td>
+            <td>UndoManager</td>
+        </tr>
+        <tr>
+            <td><strong>Service层</strong></td>
+            <td>services/</td>
+            <td>无状态业务逻辑，不持有数据</td>
+            <td>CardMatchService, GameModelFromLevelGenerator</td>
+        </tr>
+        <tr>
+            <td><strong>Utils层</strong></td>
+            <td>utils/</td>
+            <td>通用工具函数</td>
+            <td>CardUtils</td>
+        </tr>
+    </table>
+
+    <h3>层间依赖关系</h3>
+    <pre><code>Controller  ---->  Model      (持有并修改)
+Controller  ---->  View       (调用动画接口更新UI)
+Controller  ---->  Manager    (作为成员变量)
+Controller  ---->  Service    (调用静态方法)
+View        ---->  Controller (通过回调接口，不直接引用)
+Manager     ---->  Model      (持有并加工)
+Manager  --X-->  Controller (禁止反向依赖)
+Service  --X-->  Controller (不依赖Controller)
+Service  --X-->  Model数据   (不持有，只加工)</code></pre>
+</section>
+
+<!-- ==================== 文件结构 ==================== -->
+<section id="files">
+    <h2>三、文件结构</h2>
+    <div class="tree">
+<span class="folder">Classes/</span>
+├── AppDelegate.cpp/h          <span class="comment"># 应用入口，设置窗口和分辨率</span>
+├── GameScene.cpp/h            <span class="comment"># 游戏场景，创建背景和GameController</span>
+│
+├── <span class="folder">configs/</span>
+│   ├── <span class="folder">loaders/</span>
+│   │   └── LevelConfigLoader  <span class="comment"># 从JSON加载关卡配置</span>
+│   └── <span class="folder">models/</span>
+│       ├── LevelConfig         <span class="comment"># 关卡静态配置数据结构</span>
+│       └── CardResConfig       <span class="comment"># 卡牌资源路径配置（图片路径）</span>
+│
+├── <span class="folder">models/</span>
+│   ├── CardModel               <span class="comment"># 单张卡牌数据：花色、点数、位置、遮盖关系、序列化</span>
+│   ├── GameModel               <span class="comment"># 游戏全局数据：牌区列表、牌堆、手牌区</span>
+│   └── UndoModel               <span class="comment"># 撤销记录栈</span>
+│
+├── <span class="folder">views/</span>
+│   ├── CardView                <span class="comment"># 单张卡牌视图：正反面显示、翻牌动画、点击事件</span>
+│   ├── GameView                <span class="comment"># 游戏主视图容器：管理子视图布局和回退按钮</span>
+│   ├── PlayFieldView           <span class="comment"># 主牌区视图：管理所有桌面卡牌视图</span>
+│   ├── TrayView                <span class="comment"># 手牌区视图：显示当前顶部牌</span>
+│   └── StackView               <span class="comment"># 备用牌堆视图：显示剩余数量</span>
+│
+├── <span class="folder">controllers/</span>
+│   ├── GameController          <span class="comment"># 主控制器：初始化、动画调度、undo、胜负判断</span>
+│   ├── PlayFieldController     <span class="comment"># 主牌区控制器：卡牌点击验证</span>
+│   └── StackController         <span class="comment"># 备用牌堆控制器：抽牌逻辑</span>
+│
+├── <span class="folder">managers/</span>
+│   └── UndoManager             <span class="comment"># 撤销管理器：记录和回滚操作历史</span>
+│
+├── <span class="folder">services/</span>
+│   ├── CardMatchService        <span class="comment"># 匹配规则服务：点数差1可匹配</span>
+│   └── GameModelFromLevelGenerator <span class="comment"># 从LevelConfig生成运行时GameModel</span>
+│
+└── <span class="folder">utils/</span>
+    └── CardUtils               <span class="comment"># 卡牌工具函数（字符串转换等）</span>
+    </div>
+</section>
+
+<!-- ==================== 交互流程 ==================== -->
+<section id="flow">
+    <h2>四、核心交互流程</h2>
+
+    <h3>1. 游戏初始化</h3>
+    <div class="flow">
+        <span class="step">GameScene::init()</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">创建背景层</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">GameController::init()</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">LevelConfigLoader 加载JSON</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">GameModelFromLevelGenerator 生成Model</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">创建GameView</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">初始化PlayField/Stack/Tray</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">注册回调</span>
+    </div>
+
+    <h3>2. 桌面牌匹配（牌区 &rarr; 手牌区）</h3>
+    <div class="flow">
+        <span class="step">用户点击卡牌</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">CardView触发回调</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">PlayFieldController 验证状态</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">CardMatchService 检查匹配</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">GameModel 更新数据</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">UndoManager 记录操作</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">卡牌重挂到GameView</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">EaseInOut动画飞向手牌区</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">更新TrayView + 翻开被遮盖的牌</span>
+    </div>
+
+    <h3>3. 备用牌抽牌（牌堆 &rarr; 手牌区）</h3>
+    <div class="flow">
+        <span class="step">用户点击牌堆</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">StackController 触发回调</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">GameModel pop牌堆顶牌</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">UndoManager 记录</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">创建动画卡牌于牌堆位置</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">移动+翻转动画飞向手牌区</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">更新TrayView和StackView计数</span>
+    </div>
+
+    <h3>4. 回退操作</h3>
+    <div class="flow">
+        <span class="step">用户点击回退</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">UndoManager pop记录</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">GameModel 恢复数据</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">创建动画卡牌于手牌区位置</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">EaseInOut动画飞回原位/牌堆</span>
+        <span class="arrow">&rarr;</span>
+        <span class="step">创建最终CardView + 恢复遮盖关系</span>
+    </div>
+</section>
+
+<!-- ==================== Bug修复 ==================== -->
+<section id="bugs">
+    <h2>五、Bug修复记录</h2>
+    <p>以下是开发/调试过程中发现并修复的所有Bug：</p>
+
+    <div class="bug-card fixed">
+        <h4>Bug #0：编译错误 - MSVC UTF-8 编码问题</h4>
+        <span class="label label-file">proj.win32/CardGame.vcxproj</span>
+        <span class="label label-cause">原因</span> 源码中含中文注释（UTF-8编码），MSVC默认按GBK解析导致语法错误（C2059, C4430等）
+        <br><span class="label label-fix">修复</span> 在vcxproj的Debug和Release配置中添加 <code>/utf-8</code> 编译选项
+        <pre><code>&lt;AdditionalOptions&gt;/utf-8 %(AdditionalOptions)&lt;/AdditionalOptions&gt;</code></pre>
+    </div>
+
+    <div class="bug-card fixed">
+        <h4>Bug #1：回退后崩溃 - CardView未注册到Map</h4>
+        <span class="label label-file">GameController.cpp / PlayFieldView.h</span>
+        <span class="label label-cause">原因</span> 回退操作恢复卡牌时，新创建的CardView只添加到了场景树（addChild），没有注册到PlayFieldView的 <code>_cardViews</code> map中。后续对该卡牌的任何操作（flipCard、getCardView）都找不到它，导致空指针崩溃。
+        <br><span class="label label-fix">修复</span> 新增 <code>PlayFieldView::addCardView(int, CardView*)</code> 方法，在回退时同步注册到map
+        <pre><code>// 回退时注册视图
+_gameView->getPlayFieldView()->addChild(restoredView);
+_gameView->getPlayFieldView()->addCardView(card->getId(), restoredView); // 新增</code></pre>
+    </div>
+
+    <div class="bug-card fixed">
+        <h4>Bug #2：flipCard始终显示正面</h4>
+        <span class="label label-file">PlayFieldView.cpp</span>
+        <span class="label label-cause">原因</span> 翻牌动画的回调中硬编码调用 <code>showFront()</code>，没有检查CardModel的实际faceUp状态。导致需要翻回背面的牌也显示正面。
+        <br><span class="label label-fix">修复</span> 修改为根据 <code>getCardModel()->isFaceUp()</code> 决定显示正面还是背面
+        <pre><code>cardView->playFlipAnimation([cardView, shouldBeClickable]() {
+    if (cardView->getCardModel() && cardView->getCardModel()->isFaceUp())
+        cardView->showFront();
+    else
+        cardView->showBack();
+    cardView->setClickable(shouldBeClickable);
+});</code></pre>
+    </div>
+
+    <div class="bug-card fixed">
+        <h4>Bug #3：翻开的牌不可点击</h4>
+        <span class="label label-file">PlayFieldView.cpp</span>
+        <span class="label label-cause">原因</span> <code>flipCard()</code> 只播放翻转动画，但没有更新卡牌的clickable状态。被解除遮盖并翻开的牌无法被点击。
+        <br><span class="label label-fix">修复</span> 在翻转动画回调中根据 <code>isFaceUp() && !isCovered()</code> 设置 <code>setClickable()</code>
+    </div>
+
+    <div class="bug-card fixed">
+        <h4>Bug #4：遮盖关系重复添加</h4>
+        <span class="label label-file">CardModel.cpp</span>
+        <span class="label label-cause">原因</span> <code>addCoveredBy()</code> 没有去重检查。回退操作反复执行时，同一个遮盖ID被重复添加到 <code>_coveredByIds</code> 列表中，导致 <code>removeCoveredBy()</code> 一次只能移除一个，遮盖关系无法正确解除。
+        <br><span class="label label-fix">修复</span> 添加 <code>std::find</code> 去重判断
+        <pre><code>void CardModel::addCoveredBy(int id) {
+    auto it = std::find(_coveredByIds.begin(), _coveredByIds.end(), id);
+    if (it == _coveredByIds.end()) {
+        _coveredByIds.push_back(id);
+    }
+}</code></pre>
+    </div>
+
+    <div class="bug-card fixed">
+        <h4>Bug #5：牌区→手牌区动画坐标错误（卡牌飞到屏幕外）</h4>
+        <span class="label label-file">GameController.cpp</span>
+        <span class="label label-cause">原因</span> 原代码使用 <code>TrayView::getTopCardPosition()</code>（返回的是GameView空间坐标）传入 <code>convertToWorldSpace()</code>（期望TrayView本地坐标），导致坐标转换错误，目标位置偏离屏幕。
+        <br><span class="label label-fix">修复</span> 改为将CardView从PlayFieldView重挂到GameView上，直接在GameView坐标系中计算目标位置：
+        <pre><code>// 获取卡牌的世界坐标，转换到GameView空间
+Vec2 worldPos = cardView->getParent()->convertToWorldSpace(cardView->getPosition());
+Vec2 gameViewPos = _gameView->convertToNodeSpace(worldPos);
+// 重挂到GameView
+cardView->retain();
+_gameView->getPlayFieldView()->detachCardView(cardId);
+cardView->removeFromParent();
+cardView->setPosition(gameViewPos);
+_gameView->addChild(cardView, 50);
+cardView->release();
+// 目标：手牌区中心
+Vec2 trayPos = _gameView->getTrayView()->getPosition();
+Vec2 trayTarget(trayPos.x - cardSize.width*0.5f, trayPos.y - cardSize.height*0.5f);</code></pre>
+    </div>
+
+    <div class="bug-card fixed">
+        <h4>Bug #6：回退时CardView创建后model已改状态</h4>
+        <span class="label label-file">GameController.cpp</span>
+        <span class="label label-cause">原因</span> 回退牌堆→手牌区时，先设 <code>card->setFaceUp(false)</code> 再创建CardView，CardView的init读到faceUp=false直接显示背面，后续手动showFront无效。
+        <br><span class="label label-fix">修复</span> 调整顺序：先在faceUp=true时创建CardView，再修改model状态
+    </div>
+</section>
+
+<!-- ==================== 优化改进 ==================== -->
+<section id="improve">
+    <h2>六、优化改进记录</h2>
+
+    <div class="improve-card">
+        <h4>改进 #1：卡牌视觉布局优化</h4>
+        <span class="label label-file">CardView.cpp</span>
+        <ul>
+            <li><strong>花色图标</strong>：从左上角 <code>(15, h-60)</code> 移动到右上角 <code>(w-20, h-30)</code></li>
+            <li><strong>小数字</strong>：保持左上角 <code>(15, h-30)</code></li>
+            <li><strong>大数字</strong>：保持中心 <code>(w/2, h/2)</code></li>
+            <li><strong>卡牌背面</strong>：从纯黑半透明遮罩改为蓝色底色 <code>Color4B(30,80,140,230)</code> + 菱形装饰图案</li>
+        </ul>
+    </div>
+
+    <div class="improve-card">
+        <h4>改进 #2：游戏背景美化</h4>
+        <span class="label label-file">GameScene.cpp</span>
+        <ul>
+            <li><strong>天空渐变</strong>：上深蓝 <code>(40,120,200)</code> → 下浅蓝 <code>(135,200,240)</code> 的LayerGradient</li>
+            <li><strong>绿色草地</strong>：底部28%区域 <code>Color4B(60,140,50)</code></li>
+            <li><strong>牌区背景</strong>：深棕色半透明 <code>Color4B(50,35,25,200)</code></li>
+            <li><strong>操作栏背景</strong>：深色底部面板 <code>Color4B(35,25,18,220)</code></li>
+        </ul>
+    </div>
+
+    <div class="improve-card">
+        <h4>改进 #3：UI元素美化</h4>
+        <ul>
+            <li><strong>牌堆视觉</strong>（StackView）：灰色改为蓝色背面 <code>(30,80,140)</code>，数字加描边</li>
+            <li><strong>回退按钮</strong>（GameView）：灰色改为暖棕色 <code>(160,82,45)</code>，文字改为暖色调+描边</li>
+        </ul>
+    </div>
+
+    <div class="improve-card">
+        <h4>改进 #4：全流程动画系统（详见下节）</h4>
+        <ul>
+            <li>牌区→手牌区：跨区域重挂节点 + EaseInOut平滑移动</li>
+            <li>牌堆→手牌区：移动 + 翻转动画（scaleX缩放模拟翻牌）</li>
+            <li>回退(牌区)：从手牌区位置平滑飞回原位</li>
+            <li>回退(牌堆)：从手牌区飞回牌堆 + 翻回背面动画</li>
+        </ul>
+    </div>
+
+    <div class="improve-card">
+        <h4>改进 #5：VS Build Tools 18 兼容</h4>
+        <span class="label label-file">CardGame.vcxproj / libcocos2d.vcxproj</span>
+        <ul>
+            <li>添加 <code>VisualStudioVersion == '18.0'</code> → <code>PlatformToolset v145</code> 映射</li>
+            <li>修复libcocos2d链接时找不到libSpine.lib：添加显式库搜索路径和AdditionalDependencies</li>
+        </ul>
+    </div>
+</section>
+
+<!-- ==================== 动画系统 ==================== -->
+<section id="anim">
+    <h2>七、动画系统详解</h2>
+    <p>所有卡牌操作都通过 <code>_isAnimating</code> 标志锁定，动画期间禁止新的操作，防止状态混乱。</p>
+
+    <table>
+        <tr><th>操作</th><th>动画类型</th><th>时长</th><th>缓动</th><th>技术要点</th></tr>
+        <tr>
+            <td>牌区 &rarr; 手牌区</td>
+            <td>MoveTo</td>
+            <td>0.3s</td>
+            <td>EaseInOut</td>
+            <td>CardView从PlayFieldView重挂到GameView，避免跨节点坐标转换问题</td>
+        </tr>
+        <tr>
+            <td>牌堆 &rarr; 手牌区</td>
+            <td>MoveTo + ScaleX翻转</td>
+            <td>0.25s</td>
+            <td>EaseInOut</td>
+            <td>临时CardView在GameView上；翻转通过scaleX(1&rarr;0&rarr;1)+showFront实现</td>
+        </tr>
+        <tr>
+            <td>回退(牌区)</td>
+            <td>MoveTo</td>
+            <td>0.3s</td>
+            <td>EaseOut</td>
+            <td>临时CardView从手牌区飞到原位，到达后创建最终视图并注册到map</td>
+        </tr>
+        <tr>
+            <td>回退(牌堆)</td>
+            <td>MoveTo + ScaleX翻转</td>
+            <td>0.25s</td>
+            <td>EaseInOut</td>
+            <td>移动中途通过scaleX缩放切换为背面</td>
+        </tr>
+        <tr>
+            <td>翻牌</td>
+            <td>ScaleX(1&rarr;0&rarr;1)</td>
+            <td>0.3s</td>
+            <td>线性</td>
+            <td>scaleX缩到0时切换正/反面显示，再恢复</td>
+        </tr>
+    </table>
+
+    <h3>翻转动画原理</h3>
+    <pre><code>// CardView::playFlipAnimation - 通过scaleX缩放模拟3D翻牌
+auto scaleDown = ScaleTo::create(0.15f, 0.0f, 1.0f);  // X缩到0
+auto switchFace = CallFunc::create([this]() {
+    if (_cardModel->isFaceUp()) showFront();
+    else showBack();
+});
+auto scaleUp = ScaleTo::create(0.15f, 1.0f, 1.0f);    // X恢复
+auto sequence = Sequence::create(scaleDown, switchFace, scaleUp, onComplete, nullptr);</code></pre>
+
+    <h3>跨区域动画原理</h3>
+    <p>卡牌从牌区移到手牌区时，由于两者是不同Node的子节点，直接在PlayFieldView内做MoveTo无法正确到达TrayView的位置。解决方案：</p>
+    <pre><code>// 1. 获取卡牌世界坐标
+Vec2 worldPos = cardView->getParent()->convertToWorldSpace(cardView->getPosition());
+Vec2 gameViewPos = _gameView->convertToNodeSpace(worldPos);
+
+// 2. 从PlayFieldView取出，挂到GameView（公共父节点）
+cardView->retain();
+playFieldView->detachCardView(cardId);  // 只从map移除
+cardView->removeFromParent();           // 从PlayFieldView移除
+cardView->setPosition(gameViewPos);     // 设置GameView空间坐标
+_gameView->addChild(cardView, 50);      // 挂到GameView
+cardView->release();
+
+// 3. 在GameView坐标系中计算目标位置并动画
+Vec2 trayTarget(trayPos.x - cardSize.width*0.5f, trayPos.y - cardSize.height*0.5f);
+cardView->runAction(EaseInOut::create(MoveTo::create(0.3f, trayTarget), 2.0f));</code></pre>
+</section>
+
+<!-- ==================== 扩展指南 ==================== -->
+<section id="extend">
+    <h2>八、扩展指南（加分项）</h2>
+
+    <h3>如何新增一种卡牌类型</h3>
+    <p>例如：添加"Joker"（大小王）。</p>
+    <ol>
+        <li><strong>Model层</strong>：在 <code>CardModel.h</code> 的枚举中添加新值
+            <pre><code>enum CardFaceType {
+    // ... 原有类型
+    CFT_KING,
+    CFT_JOKER,          // 新增
+    CFT_NUM_CARD_FACE_TYPES
+};
+enum CardSuitType {
+    // ... 原有类型
+    CST_JOKER_RED,      // 新增（如需）
+    CST_JOKER_BLACK,    // 新增
+};</code></pre>
+        </li>
+        <li><strong>Config层</strong>：在 <code>CardResConfig.h</code> 的路径方法中添加对应资源
+            <pre><code>// getBigNumberPath中添加
+case CFT_JOKER: return "res/number/big_joker.png";
+// getSuitPath中添加
+case CST_JOKER_RED: return "res/suits/joker_red.png";</code></pre>
+        </li>
+        <li><strong>Service层</strong>：在 <code>CardMatchService</code> 中更新匹配规则（如Joker可匹配任意牌）
+            <pre><code>static bool canMatch(CardFaceType f1, CardFaceType f2) {
+    if (f1 == CFT_JOKER || f2 == CFT_JOKER) return true; // 万能牌
+    return std::abs((int)f1 - (int)f2) == 1;
+}</code></pre>
+        </li>
+        <li><strong>关卡JSON</strong>：在 <code>level_1.json</code> 的Playfield或Stack中添加新牌数据</li>
+    </ol>
+    <p><strong>不需要修改</strong>：View层、Controller层、Manager层 —— 它们都通过枚举和接口工作，自动适配新类型。</p>
+
+    <h3>如何新增一种回退类型</h3>
+    <p>例如：添加"特殊技能使用"的回退。</p>
+    <ol>
+        <li><strong>Model层</strong>：在 <code>UndoModel.h</code> 的枚举中添加新类型
+            <pre><code>enum UndoActionType {
+    UNDO_PLAYFIELD_TO_TRAY,
+    UNDO_STACK_TO_TRAY,
+    UNDO_SKILL_USE          // 新增
+};</code></pre>
+            如需额外数据，扩展 <code>UndoRecord</code> 结构体：
+            <pre><code>struct UndoRecord {
+    UndoActionType type;
+    int cardId;
+    cocos2d::Vec2 originalPosition;
+    std::vector&lt;int&gt; uncoveredCardIds;
+    int skillType;              // 新增：技能类型
+    std::string extraData;      // 新增：额外数据
+};</code></pre>
+        </li>
+        <li><strong>Manager层</strong>：在 <code>UndoManager</code> 中添加记录方法
+            <pre><code>void recordSkillUse(int cardId, int skillType) {
+    UndoRecord record;
+    record.type = UNDO_SKILL_USE;
+    record.cardId = cardId;
+    record.skillType = skillType;
+    _undoModel->pushRecord(record);
+}</code></pre>
+        </li>
+        <li><strong>Controller层</strong>：在 <code>GameController::onUndoClick()</code> 中添加新分支
+            <pre><code>} else if (record.type == UNDO_SKILL_USE) {
+    // 恢复技能使用前的状态
+    // 创建动画...
+}</code></pre>
+        </li>
+    </ol>
+    <p><strong>设计要点</strong>：UndoRecord是纯数据结构，所有回退逻辑在Controller中处理。Manager只负责记录和弹出，不包含恢复逻辑。</p>
+
+    <h3>如何新增一个关卡</h3>
+    <ol>
+        <li>在 <code>Resources/levels/</code> 下创建新JSON文件（如 <code>level_2.json</code>）</li>
+        <li>按照现有格式定义Playfield和Stack数组</li>
+        <li>修改 <code>GameController::init()</code> 中的关卡文件路径，或实现关卡选择UI</li>
+    </ol>
+</section>
+
+<!-- ==================== 构建说明 ==================== -->
+<section id="build">
+    <h2>九、构建与运行</h2>
+
+    <h3>环境要求</h3>
+    <table>
+        <tr><th>项目</th><th>版本</th></tr>
+        <tr><td>游戏引擎</td><td>Cocos2d-x 3.17.2</td></tr>
+        <tr><td>编译器</td><td>MSVC v143/v145 (VS 2022/2025 Build Tools)</td></tr>
+        <tr><td>Windows SDK</td><td>10.0.26100.0</td></tr>
+        <tr><td>平台</td><td>Win32 (x86)</td></tr>
+    </table>
+
+    <h3>构建命令</h3>
+    <pre><code># 使用 MSBuild 命令行构建
+cd D:\desktop\game_design\CardGameBuild
+MSBuild.exe proj.win32/CardGame.vcxproj /p:Configuration=Debug /p:Platform=Win32 /p:PlatformToolset=v145 /m</code></pre>
+
+    <h3>输出路径</h3>
+    <pre><code>D:\desktop\game_design\CardGameBuild\proj.win32\Debug.win32\CardGame.exe</code></pre>
+
+    <h3>项目目录结构</h3>
+    <div class="tree">
+<span class="folder">D:\desktop\game_design\</span>
+├── <span class="folder">CardGameBuild/</span>        <span class="comment"># 构建目录（含cocos2d引擎和编译产物）</span>
+│   ├── <span class="folder">Classes/</span>           <span class="comment"># 游戏源码</span>
+│   ├── <span class="folder">Resources/</span>         <span class="comment"># 资源文件（图片、JSON关卡）</span>
+│   ├── <span class="folder">cocos2d/</span>           <span class="comment"># Cocos2d-x引擎（junction link）</span>
+│   └── <span class="folder">proj.win32/</span>        <span class="comment"># VS项目文件和编译输出</span>
+├── <span class="folder">CardGame/</span>             <span class="comment"># 源码备份目录</span>
+├── 纸牌程序设计.pdf       <span class="comment"># 需求文档</span>
+└── 程序设计文档.html      <span class="comment"># 本文档</span>
+    </div>
+</section>
+
+</div>
+</body>
+</html>
