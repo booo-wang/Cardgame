@@ -1,8 +1,8 @@
 ﻿# 纸牌消除小游戏 CardGame
 
-这是一个使用 **C++ + Cocos2d-x 3.17.2** 开发的纸牌消除小游戏，也是我的一次应聘测试项目。
+这是一个使用 **C++ + Cocos2d-x 3.17.2** 开发的纸牌消除小游戏。
 
-项目目标是按照给定 PDF 需求，完成一个可运行、可回退、具备基础动画表现的纸牌程序，并整理为可以直接运行和可以从源码构建的 GitHub 仓库。
+项目目标是按照给定需求，完成一个可运行、可回退、具备基础动画表现的纸牌程序，并整理为可以直接运行和可以从源码构建的 GitHub 仓库。
 
 ## 项目简介
 
@@ -115,10 +115,7 @@ proj.win32\Debug.win32\CardGame.exe
 - 动画系统说明
 - 扩展指南
 
-## English Note
-
-This repository is intentionally documented in Chinese-first form because it is used as an interview test submission. The project itself remains source-complete for Win32 development and runnable out of the box through the bundled `Release/` package.
 
 ## License
 
-For interview / educational demonstration use.
+For interview demonstration use.
